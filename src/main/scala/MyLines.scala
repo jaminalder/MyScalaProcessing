@@ -1,11 +1,10 @@
-import color.{Colorizer, Color}
+import color.{Style, Color, Colorizer}
 import geometry._
 import processing.core._
 
 import scala.annotation.tailrec
 import scala.collection.immutable.IndexedSeq
 import scala.collection.mutable.ListBuffer
-import scala.util.Random
 
 object MyLines extends PApplet {
 
@@ -15,9 +14,9 @@ object MyLines extends PApplet {
     test = new MyLines
     val frame = new javax.swing.JFrame("Test")
     frame.getContentPane().add(test)
-    test.init
-    frame.setSize(500,500)
+    frame.setSize(1700,700)
     frame.setVisible(true)
+    test.init
   }
 
 }
@@ -27,12 +26,13 @@ class MyLines extends PApplet {
   val drawer = new Drawer(this)
 
   override def setup() = {
-    size(500,500)
+    size(1700,700)
     smooth()
-    background(255)
+    background(0)
     noFill()
 
-    strokeWeight(0.01)
+    strokeWeight(0.1)
+    noStroke()
 
     val center = (250, 250)
 
@@ -46,17 +46,18 @@ class MyLines extends PApplet {
     //val spiralPoints: List[Vec] = pointsOfPolarFunction(spiralPolarFunction(3), 10, Math.PI/2)
     //drawer.lines(Line.getConsecutiveLines(spiralPoints.toList.map(_.translate(center))))
 
-    val poly = Polygon.regular(3,800,0,center)
+    val poly = Polygon.regular(6,150,0,center)
 
     val innerPolys1: List[Polygon] = innerPolygons(poly, 0.1, 2)
 
     val triangles: List[Polygon] = innerTriangles(innerPolys1)
 
-    val colorizedTriangles: List[(Polygon, Color)] = Colorizer.colorizePolygonsRoundRobin(Colorizer.PALETTE_1, triangles)
+    val colorizedPolygons: List[(Polygon, Style)] = Colorizer.fillRoundRobin(Colorizer.PALETTE_4, innerPolys1)
+    val colorizedTriangles: List[(Polygon, Style)] = Colorizer.fillRoundRobin(Colorizer.PALETTE_1, triangles)
 
     //drawer.lines(innerPolys1.map(_.lines).flatten)
 
-    colorizedTriangles.foreach(drawer.fillPolygon(_))
+    colorizedPolygons.reverse.foreach(drawer.draw(_))
   }
 
   def innerTriangles(polygons:List[Polygon]):List[Polygon] = polygons match {
@@ -101,7 +102,7 @@ class MyLines extends PApplet {
     val myLines:ListBuffer[Line] = lines.tail.to[ListBuffer]
 
     0 to steps-1 foreach {n =>
-      val nextLine = Line(myLines.last.to, myLines(n).from).prolong(10)
+      val nextLine = Line(myLines.last.to, myLines(n).from).scale(10)
       myLines += nextLine
 
     }

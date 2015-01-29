@@ -1,4 +1,4 @@
-import geometry.{Polygon, Line, Vec}
+import geometry._
 import org.scalatest._
 
 class TestsSpec extends FlatSpec with Matchers {
@@ -35,11 +35,6 @@ class TestsSpec extends FlatSpec with Matchers {
     assert(polys.size == 6)
   }
 
-  "The sub polygons" should "one have 5 the others 3 neighbors" in {
-    assert(polys.head.findNeighbors(polys.tail).size == 5)
-    assert(polys(1).findNeighbors(polys.head::polys.drop(2)).size == 3)
-  }
-
   "A Vec" should "find a point between himself and another Vec" in {
     val v1:Vec = (10,10)
     val v2:Vec = (30,30)
@@ -55,6 +50,26 @@ class TestsSpec extends FlatSpec with Matchers {
     val midPoint = Line(v1,v2).midPoint
     assert(Vec(20,20) == midPoint)
 
+  }
+
+  "A Vec" should "be negatable with the unary operator -" in {
+    val v: Vec = Vec(10,10)
+    val mv: Vec = -v
+    assert(mv.x == -10)
+    assert(mv.y == -10)
+  }
+
+  "A Vec" should "be rotatable" in {
+    val v: Vec = Vec(20,20)
+    val rotated180 = v.rotate(Vec(10,10), Math.PI)
+    assert(Vec(0,0) == rotated180)
+  }
+
+  "A Bezier Curve" should "find its points" in {
+    val curve: BezierCurve = BezierCurve(List((10,10), (20,20), (30,30)))
+    assert(Vec(10,10) == curve.pointAt(0))
+    assert(Vec(30,30) == curve.pointAt(1))
+    assert(Vec(20,20) == curve.pointAt(0.5))
   }
 
 }
